@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="megabot">
+    <meta name="keywords" content="megabot">
+    <meta name="author" content="megabot">
+<title>Learning Bot</title>
+    <!-- Google font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js" integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/" crossorigin="anonymous"></script>
+  
+    <!-- Custom Iconsax CSS -->
+    <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='bot/css/vendors/iconsax.css')}}" />
+
+    <!-- Custom Style CSS -->
+    <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='bot/css/style.css')}}">
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://kit.fontawesome.com/181ea7bd20.js" crossorigin="anonymous"></script>
+    <style>
+        .responses{
+            color: white ;
+           box-shadow: 0px 2px 5px rgba(0,0,0,0.4);
+           margin: 10px;
+           padding: 10px;
+           width: 100%;
+           max-width: 1090px;
+           margin: 0 auto;
+        }
+        .responses strong{
+            font-size: larger;
+        }
+        .msger-chat {
+            width: 100%;
+            max-width: 1120px;
+            margin: 0 auto;
+            overflow-y: scroll;
+            height: 65vh;
+        }
+    </style>
+</head>
+
+<body>
+  <div id="chat-wrapper">
+    <div class="main-wrapper">
+        <div class="chat-header">
+            <div class=" ">
+                <h3 id="targetDiv">Ask anything</h3>
+            </div>
+            <div class="header-option">
+                <a class="del-btn" href="/home"><i class="fa fa-home" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="main-chat">
+            <div class="msger-chat " id="chat-content"></div>
+
+            <form class="msger-inputarea" id="chat-form">
+                <input type="text" class="msger-input" placeholder="Ask any question here..." id="prompt" required>
+                <button type="submit" class="msger-send-btn"><i class="iconsax" data-icon="send-1"></i></button>
+            </form>
+        </div>
+    </div>
+  </div>
+      
+        <script>
+     
+
+        </script>
+    </section>
+
+    <!-- Bootstrap JS -->
+    <script src="{{url_for('static',filename='bot/js/bootstrap.bundle.min.js')}}"></script>
+    <!-- Iconsax JS -->
+    <script src="{{url_for('static',filename='bot/js/iconsax.js')}}"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const chatForm = document.getElementById('chat-form');
+            const chatContent = document.getElementById('chat-content');
+            const promptInput = document.getElementById('prompt');
+        
+            chatForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+        
+                const userInput = promptInput.value;
+                if (!userInput) return;
+        
+                chatContent.innerHTML += `<div class="msg left-msg"><div class="msg-bubble"><div class="msg-text">${userInput}</div></div></div>`;
+                promptInput.value = '';
+        
+                fetch('/bot/ask-chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ prompt: userInput })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        chatContent.innerHTML += `<div class="msg right-msg"><div class="msg-bubble"><div class="msg-text">${data.error}</div></div></div>`;
+                    } else {
+                        chatContent.innerHTML += `<div class="msg right-msg"><div class="msg-bubble"><div class="msg-text">${data.response}</div></div></div>`;
+                    }
+        
+                    chatContent.scrollTop = chatContent.scrollHeight;
+                })
+                .catch(error => {
+                    chatContent.innerHTML += `<div class="msg right-msg"><div class="msg-bubble"><div class="msg-text">An error occurred: ${error.message}</div></div></div>`;
+                });
+            });
+        });
+        </script>
+        
+</body>
+</html>
